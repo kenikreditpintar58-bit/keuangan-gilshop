@@ -135,8 +135,52 @@
 
 <script>
     // --- KONFIGURASI FIREBASE CLOUD ---
-    // GANTI TEKS DI BAWAH INI DENGAN LINK FIREBASE ANDA (Gunakan akhiran '/' diujungnya)
-    const FIREBASE_DB_URL = "https://warung-gilshop-default-rtdb.firebaseio.com/";
+const FIREBASE_DB_URL = "https://warung-gilshop-default-rtdb.firebaseio.com/"; // Pastikan tetap seperti ini!
+
+// FUNGSI MEMUAT DATA DARI FIREBASE (Dipanggil saat halaman dibuka)
+function muatData dari Cloud() {
+    fetch(`${FIREBASE_DB_URL}produk.json`)
+    .then(response => response.json())
+    .then(data => {
+        // Hilangkan tulisan "Memuat Data..." di status utama
+        const statusBadge = document.querySelector('.badge');
+        if (statusBadge) {
+            statusBadge.innerText = "Terhubung ke Cloud";
+            statusBadge.className = "badge bg-success text-white ms-2"; // Ubah warna jadi hijau
+        }
+        
+        if (data) {
+            produk = data;
+        } else {
+            produk = {}; // Jika database masih kosong
+        }
+        perbaruiTabel();
+    })
+    .catch(error => {
+        console.error("Gagal memuat data:", error);
+        const statusBadge = document.querySelector('.badge');
+        if (statusBadge) statusBadge.innerText = "Koneksi Gagal";
+    });
+}
+
+// FUNGSI SIMPAN BARANG KE FIREBASE
+function simpanKeCloud() {
+    // Jalankan perintah simpan Anda yang biasa, lalu di ujungnya tambahkan ini:
+    fetch(`${FIREBASE_DB_URL}produk.json`, {
+        method: 'PUT',
+        body: JSON.stringify(produk)
+    })
+    .then(response => response.json())
+    .then(() => {
+        alert("Data berhasil disinkronkan ke Cloud Firebase!");
+        perbaruiTabel();
+    });
+}
+
+// Pastikan fungsi muatData dari Cloud() dijalankan saat aplikasi pertama kali terbuka
+window.onload = function() {
+    muatData dari Cloud();
+};
 
     let produk = {};
     let logPenjualan = {};
